@@ -1,4 +1,3 @@
-```javascript
 import { create } from 'zustand';
 import { db } from '../firebase';
 import { doc, setDoc, onSnapshot, getDoc } from 'firebase/firestore';
@@ -187,4 +186,3 @@ export const useStore = create((set, get) => ({
         }
     },
 }));
-```
