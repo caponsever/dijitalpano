@@ -54,16 +54,20 @@ export const useStore = create((set, get) => ({
 
         // Connectivity Test
         getDoc(doc(db, COLLECTION, 'settings'))
-            .then((snap) => console.log('Connectivity Test: Read success', snap.exists()))
+            .then((snap) => {
+                console.log('Connectivity Test: Read success', snap.exists());
+                console.log('Connectivity Source:', snap.metadata.fromCache ? 'CACHE (Offline)' : 'SERVER (Online)');
+                console.log('Connectivity Data:', snap.data());
+            })
             .catch((err) => console.error('Connectivity Test: Read failed', err));
 
         const unsubSettings = onSnapshot(doc(db, COLLECTION, 'settings'), (doc) => {
-            console.log('Settings update received:', doc.exists(), doc.data());
+            console.log('Settings update received. Source:', doc.metadata.fromCache ? 'CACHE' : 'SERVER');
             if (doc.exists()) set({ settings: doc.data() });
         }, (error) => console.error('Settings listener error:', error));
 
         const unsubSlides = onSnapshot(doc(db, COLLECTION, 'slides'), (doc) => {
-            console.log('Slides update received:', doc.exists());
+            console.log('Slides update received. Source:', doc.metadata.fromCache ? 'CACHE' : 'SERVER');
             if (doc.exists()) set({ slides: doc.data().list || [] });
         }, (error) => console.error('Slides listener error:', error));
 
