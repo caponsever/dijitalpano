@@ -1,10 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {
-    initializeFirestore,
-    persistentLocalCache,
-    persistentMultipleTabManager
-} from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
@@ -22,11 +18,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-// Initialize Firestore with Long Polling (to bypass firewalls) and Persistence
-export const db = initializeFirestore(app, {
-    experimentalForceLongPolling: true, // Force Long Polling for restrictive networks
-    localCache: persistentLocalCache({
-        tabManager: persistentMultipleTabManager()
-    })
-});
-
+export const db = getFirestore(app);
