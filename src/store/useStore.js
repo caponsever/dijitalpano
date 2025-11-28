@@ -52,13 +52,7 @@ export const useStore = create((set, get) => ({
     initialize: () => {
         console.log('Store initializing...');
 
-        // 1. Generic Internet Test
-        fetch('https://jsonplaceholder.typicode.com/todos/1')
-            .then(response => response.json())
-            .then(json => console.log('Generic Internet Test: SUCCESS', json))
-            .catch(err => console.error('Generic Internet Test: FAILED', err));
-
-        // 2. Firebase Listener
+        // Firebase Listener
         const unsubSettings = onSnapshot(doc(db, COLLECTION, 'settings'), (doc) => {
             console.log('Settings update received. Source:', doc.metadata.fromCache ? 'CACHE' : 'SERVER');
             if (doc.exists()) set({ settings: doc.data() });
