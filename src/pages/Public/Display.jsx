@@ -119,7 +119,7 @@ const SpecificDaysBanner = ({ text }) => {
 };
 
 const PublicDisplay = () => {
-    const { settings, slides, bellSchedule, dutyTeachers, foodMenu, birthdays, specificDays } = useStore();
+    const { settings, slides, bellSchedule, dutyTeachers, foodMenu, birthdays, specificDays, connectionStatus } = useStore();
 
     // Calculate active specific day
     const today = new Date().toISOString().split('T')[0];
@@ -175,6 +175,7 @@ const PublicDisplay = () => {
                 </div>
 
                 <div className="flex items-center gap-6">
+                    <div className={`w-3 h-3 rounded-full ${connectionStatus === 'online' ? 'bg-green-500 shadow-[0_0_10px_#22c55e]' : 'bg-red-500 shadow-[0_0_10px_#ef4444]'} transition-colors duration-500`} title={connectionStatus === 'online' ? 'Online' : 'Offline'} />
                     <CountdownTimer />
                     <Clock />
                 </div>

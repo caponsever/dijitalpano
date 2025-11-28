@@ -47,6 +47,7 @@ export const useStore = create((set, get) => ({
         { id: '1', name: 'Öğretmenler Günü', startDate: '2025-11-24', endDate: '2025-11-24' },
         { id: '2', name: 'Bilişim Haftası (Demo)', startDate: '2025-11-25', endDate: '2025-11-30' }
     ],
+    connectionStatus: 'connecting', // 'connecting', 'online', 'offline'
 
     // Initialization (Listeners)
     initialize: () => {
@@ -54,9 +55,15 @@ export const useStore = create((set, get) => ({
 
         // Firebase Listener
         const unsubSettings = onSnapshot(doc(db, COLLECTION, 'settings'), (doc) => {
-            console.log('Settings update received. Source:', doc.metadata.fromCache ? 'CACHE' : 'SERVER');
+            const source = doc.metadata.fromCache ? 'offline' : 'online';
+            console.log(`Settings update. Source: ${source.toUpperCase()}`);
+            set({ connectionStatus: source });
+
             if (doc.exists()) set({ settings: doc.data() });
-        }, (error) => console.error('Settings listener error:', error));
+        }, (error) => {
+            console.error('Settings listener error:', error);
+            set({ connectionStatus: 'offline' });
+        });
 
         const unsubSlides = onSnapshot(doc(db, COLLECTION, 'slides'), (doc) => {
             console.log('Slides update received. Source:', doc.metadata.fromCache ? 'CACHE' : 'SERVER');
