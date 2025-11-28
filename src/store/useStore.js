@@ -1,7 +1,7 @@
+```javascript
 import { create } from 'zustand';
 import { db } from '../firebase';
-import { db } from '../firebase';
-import { doc, setDoc, onSnapshot, getDoc, getDocFromServer } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, getDoc } from 'firebase/firestore';
 
 const COLLECTION = 'appData';
 
@@ -46,53 +46,65 @@ export const useStore = create((set, get) => ({
     ],
     specificDays: [
         { id: '1', name: 'Öğretmenler Günü', startDate: '2025-11-24', endDate: '2025-11-24' },
+        { id: '2', name: 'Bilişim Haftası (Demo)', startDate: '2025-11-25', endDate: '2025-11-30' }
+    ],
+
+    // Initialization (Listeners)
+    initialize: () => {
+        console.log('Store initializing...');
+
+        const unsubSettings = onSnapshot(doc(db, COLLECTION, 'settings'), (doc) => {
+            console.log('Settings update received. Source:', doc.metadata.fromCache ? 'CACHE' : 'SERVER');
+            if (doc.exists()) set({ settings: doc.data() });
+        }, (error) => console.error('Settings listener error:', error));
+
         const unsubSlides = onSnapshot(doc(db, COLLECTION, 'slides'), (doc) => {
             console.log('Slides update received. Source:', doc.metadata.fromCache ? 'CACHE' : 'SERVER');
             if (doc.exists()) set({ slides: doc.data().list || [] });
         }, (error) => console.error('Slides listener error:', error));
 
-    const unsubBell = onSnapshot(doc(db, COLLECTION, 'bellSchedule'), (doc) => {
-        if (doc.exists()) set({ bellSchedule: doc.data().list || [] });
-    });
-    const unsubDuty = onSnapshot(doc(db, COLLECTION, 'dutyTeachers'), (doc) => {
-        if (doc.exists()) set({ dutyTeachers: doc.data().list || [] });
-    });
-    const unsubFood = onSnapshot(doc(db, COLLECTION, 'foodMenu'), (doc) => {
-        if (doc.exists()) set({ foodMenu: doc.data().list || [] });
-    });
-    const unsubBirthdays = onSnapshot(doc(db, COLLECTION, 'birthdays'), (doc) => {
-        if (doc.exists()) set({ birthdays: doc.data().list || [] });
-    });
-    const unsubSpecificDays = onSnapshot(doc(db, COLLECTION, 'specificDays'), (doc) => {
-        if (doc.exists()) set({ specificDays: doc.data().list || [] });
-    });
+        const unsubBell = onSnapshot(doc(db, COLLECTION, 'bellSchedule'), (doc) => {
+            if (doc.exists()) set({ bellSchedule: doc.data().list || [] });
+        });
+        const unsubDuty = onSnapshot(doc(db, COLLECTION, 'dutyTeachers'), (doc) => {
+            if (doc.exists()) set({ dutyTeachers: doc.data().list || [] });
+        });
+        const unsubFood = onSnapshot(doc(db, COLLECTION, 'foodMenu'), (doc) => {
+            if (doc.exists()) set({ foodMenu: doc.data().list || [] });
+        });
+        const unsubBirthdays = onSnapshot(doc(db, COLLECTION, 'birthdays'), (doc) => {
+            if (doc.exists()) set({ birthdays: doc.data().list || [] });
+        });
+        const unsubSpecificDays = onSnapshot(doc(db, COLLECTION, 'specificDays'), (doc) => {
+            if (doc.exists()) set({ specificDays: doc.data().list || [] });
+        });
 
-    // Return cleanup function
-    return() => {
-    console.log('Store cleanup...');
-    unsubSettings();
-    unsubSlides();
-    unsubBell();
-    unsubDuty();
-    unsubFood();
-    unsubBirthdays();
-    unsubSpecificDays();
-};
+        // Return cleanup function
+        return () => {
+            console.log('Store cleanup...');
+            unsubSettings();
+            unsubSlides();
+            unsubBell();
+            unsubDuty();
+            unsubFood();
+            unsubBirthdays();
+            unsubSpecificDays();
+        };
     },
 
-// Actions (Write to Firestore)
-updateSettings: async (newSettings) => {
-    try {
-        console.log('Updating settings...', newSettings);
-        const updated = { ...get().settings, ...newSettings };
-        // Optimistic update
-        set({ settings: updated });
-        await setDoc(doc(db, COLLECTION, 'settings'), updated);
-        console.log('Settings updated in Firestore');
-    } catch (error) {
-        console.error('Error updating settings:', error);
-    }
-},
+    // Actions (Write to Firestore)
+    updateSettings: async (newSettings) => {
+        try {
+            console.log('Updating settings...', newSettings);
+            const updated = { ...get().settings, ...newSettings };
+            // Optimistic update
+            set({ settings: updated });
+            await setDoc(doc(db, COLLECTION, 'settings'), updated);
+            console.log('Settings updated in Firestore');
+        } catch (error) {
+            console.error('Error updating settings:', error);
+        }
+    },
 
     addSlide: async (slide) => {
         try {
@@ -103,75 +115,76 @@ updateSettings: async (newSettings) => {
             console.error('Error adding slide:', error);
         }
     },
-        removeSlide: async (id) => {
-            try {
-                const newSlides = get().slides.filter((s) => s.id !== id);
-                set({ slides: newSlides });
-                await setDoc(doc(db, COLLECTION, 'slides'), { list: newSlides });
-            } catch (error) {
-                console.error('Error removing slide:', error);
-            }
-        },
-            updateSlide: async (id, updatedSlide) => {
-                try {
-                    const newSlides = get().slides.map((s) => s.id === id ? { ...s, ...updatedSlide } : s);
-                    set({ slides: newSlides });
-                    await setDoc(doc(db, COLLECTION, 'slides'), { list: newSlides });
-                } catch (error) {
-                    console.error('Error updating slide:', error);
-                }
-            },
-                reorderSlides: async (newSlides) => {
-                    try {
-                        set({ slides: newSlides });
-                        await setDoc(doc(db, COLLECTION, 'slides'), { list: newSlides });
-                    } catch (error) {
-                        console.error('Error reordering slides:', error);
-                    }
-                },
+    removeSlide: async (id) => {
+        try {
+            const newSlides = get().slides.filter((s) => s.id !== id);
+            set({ slides: newSlides });
+            await setDoc(doc(db, COLLECTION, 'slides'), { list: newSlides });
+        } catch (error) {
+            console.error('Error removing slide:', error);
+        }
+    },
+    updateSlide: async (id, updatedSlide) => {
+        try {
+            const newSlides = get().slides.map((s) => s.id === id ? { ...s, ...updatedSlide } : s);
+            set({ slides: newSlides });
+            await setDoc(doc(db, COLLECTION, 'slides'), { list: newSlides });
+        } catch (error) {
+            console.error('Error updating slide:', error);
+        }
+    },
+    reorderSlides: async (newSlides) => {
+        try {
+            set({ slides: newSlides });
+            await setDoc(doc(db, COLLECTION, 'slides'), { list: newSlides });
+        } catch (error) {
+            console.error('Error reordering slides:', error);
+        }
+    },
 
-                    updateBellSchedule: async (schedule) => {
-                        try {
-                            set({ bellSchedule: schedule });
-                            await setDoc(doc(db, COLLECTION, 'bellSchedule'), { list: schedule });
-                        } catch (error) {
-                            console.error('Error updating schedule:', error);
-                        }
-                    },
+    updateBellSchedule: async (schedule) => {
+        try {
+            set({ bellSchedule: schedule });
+            await setDoc(doc(db, COLLECTION, 'bellSchedule'), { list: schedule });
+        } catch (error) {
+            console.error('Error updating schedule:', error);
+        }
+    },
 
-                        updateDutyTeachers: async (teachers) => {
-                            try {
-                                set({ dutyTeachers: teachers });
-                                await setDoc(doc(db, COLLECTION, 'dutyTeachers'), { list: teachers });
-                            } catch (error) {
-                                console.error('Error updating duty teachers:', error);
-                            }
-                        },
+    updateDutyTeachers: async (teachers) => {
+        try {
+            set({ dutyTeachers: teachers });
+            await setDoc(doc(db, COLLECTION, 'dutyTeachers'), { list: teachers });
+        } catch (error) {
+            console.error('Error updating duty teachers:', error);
+        }
+    },
 
-                            updateFoodMenu: async (menu) => {
-                                try {
-                                    set({ foodMenu: menu });
-                                    await setDoc(doc(db, COLLECTION, 'foodMenu'), { list: menu });
-                                } catch (error) {
-                                    console.error('Error updating food menu:', error);
-                                }
-                            },
+    updateFoodMenu: async (menu) => {
+        try {
+            set({ foodMenu: menu });
+            await setDoc(doc(db, COLLECTION, 'foodMenu'), { list: menu });
+        } catch (error) {
+            console.error('Error updating food menu:', error);
+        }
+    },
 
-                                updateBirthdays: async (list) => {
-                                    try {
-                                        set({ birthdays: list });
-                                        await setDoc(doc(db, COLLECTION, 'birthdays'), { list: list });
-                                    } catch (error) {
-                                        console.error('Error updating birthdays:', error);
-                                    }
-                                },
+    updateBirthdays: async (list) => {
+        try {
+            set({ birthdays: list });
+            await setDoc(doc(db, COLLECTION, 'birthdays'), { list: list });
+        } catch (error) {
+            console.error('Error updating birthdays:', error);
+        }
+    },
 
-                                    updateSpecificDays: async (list) => {
-                                        try {
-                                            set({ specificDays: list });
-                                            await setDoc(doc(db, COLLECTION, 'specificDays'), { list: list });
-                                        } catch (error) {
-                                            console.error('Error updating specific days:', error);
-                                        }
-                                    },
+    updateSpecificDays: async (list) => {
+        try {
+            set({ specificDays: list });
+            await setDoc(doc(db, COLLECTION, 'specificDays'), { list: list });
+        } catch (error) {
+            console.error('Error updating specific days:', error);
+        }
+    },
 }));
+```
