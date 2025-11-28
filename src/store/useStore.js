@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { db } from '../firebase';
-import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, getDoc } from 'firebase/firestore';
 
 const COLLECTION = 'appData';
 
@@ -51,6 +51,12 @@ export const useStore = create((set, get) => ({
     // Initialization (Listeners)
     initialize: () => {
         console.log('Store initializing...');
+
+        // Connectivity Test
+        getDoc(doc(db, COLLECTION, 'settings'))
+            .then((snap) => console.log('Connectivity Test: Read success', snap.exists()))
+            .catch((err) => console.error('Connectivity Test: Read failed', err));
+
         const unsubSettings = onSnapshot(doc(db, COLLECTION, 'settings'), (doc) => {
             console.log('Settings update received:', doc.exists(), doc.data());
             if (doc.exists()) set({ settings: doc.data() });
