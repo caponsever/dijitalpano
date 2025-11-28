@@ -11,7 +11,16 @@ import SpecificDaysAdmin from './pages/Admin/SpecificDays';
 import PublicDisplay from './pages/Public/Display';
 import Login from './pages/Login';
 
+import { useStore } from './store/useStore';
+
 function App() {
+  const initialize = useStore((state) => state.initialize);
+
+  React.useEffect(() => {
+    const cleanup = initialize();
+    return cleanup;
+  }, [initialize]);
+
   return (
     <Router>
       <Routes>
