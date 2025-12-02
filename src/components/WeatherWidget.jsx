@@ -58,7 +58,7 @@ const WeatherWidget = ({ city = 'Ankara' }) => {
     if (loading || !weather) return <div className="animate-pulse bg-white/10 h-32 rounded-xl"></div>;
 
     return (
-        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 text-white border border-white/20 shadow-lg">
+        <div className="bg-slate-900/60 backdrop-blur-md rounded-xl p-4 text-white border border-white/10 shadow-xl">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     {getWeatherIcon(weather.code)}
