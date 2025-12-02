@@ -6,6 +6,10 @@ const ScheduleAdmin = () => {
     const { bellSchedule, updateBellSchedule } = useStore();
     const [schedule, setSchedule] = useState(bellSchedule);
 
+    React.useEffect(() => {
+        setSchedule(bellSchedule);
+    }, [bellSchedule]);
+
     const handleChange = (id, field, value) => {
         setSchedule(schedule.map(item => item.id === id ? { ...item, [field]: value } : item));
     };

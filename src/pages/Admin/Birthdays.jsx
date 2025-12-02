@@ -6,6 +6,10 @@ const BirthdayAdmin = () => {
     const { birthdays, updateBirthdays } = useStore();
     const [list, setList] = useState(birthdays);
 
+    React.useEffect(() => {
+        setList(birthdays);
+    }, [birthdays]);
+
     const handleChange = (id, field, value) => {
         setList(list.map(item => item.id === id ? { ...item, [field]: value } : item));
     };

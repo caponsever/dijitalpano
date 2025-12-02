@@ -170,7 +170,7 @@ const PublicDisplay = () => {
                         <h1 className="text-2xl font-bold text-white tracking-wide leading-tight">
                             {settings.schoolName}
                         </h1>
-                        <p className="text-blue-200 text-sm font-medium tracking-wider uppercase">Dijital Bilgi Ekranı</p>
+                        <p className="text-blue-200 text-sm font-medium tracking-wider uppercase">Dijital Bilgi Ekranı v1.1</p>
                     </div>
                 </div>
 

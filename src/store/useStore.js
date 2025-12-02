@@ -7,7 +7,7 @@ const COLLECTION = 'appData';
 export const useStore = create((set, get) => ({
     // Initial State (Defaults)
     settings: {
-        schoolName: 'Yenikent Ahmet Çiçek Mesleki ve Teknik Anadolu Lisesi',
+        schoolName: 'Teknopark Ankara İvedik OSB Mesleki ve Teknik Anadolu Lisesi',
         city: 'Ankara',
         logoUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzU1NSI+TG9nbzwvdGV4dD48L3N2Zz4=',
         tickerText: '1 - 7 Kasım Türk Harf Devrimi Haftası | 10 Kasım Atatürk\'ün Ölüm Yıldönümü | 24 Kasım Öğretmenler Günü',
@@ -110,6 +110,7 @@ export const useStore = create((set, get) => ({
             console.log('Settings updated in Firestore');
         } catch (error) {
             console.error('Error updating settings:', error);
+            throw error;
         }
     },
 

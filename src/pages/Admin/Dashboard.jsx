@@ -8,14 +8,48 @@ const Dashboard = () => {
     // Local state for form inputs to avoid excessive re-renders, or just bind directly for simplicity in prototype
     const [localSettings, setLocalSettings] = useState(settings);
 
+    // Sync local state with store when store updates (e.g. after initial load)
+    React.useEffect(() => {
+        setLocalSettings(settings);
+    }, [settings]);
+
     const handleSettingChange = (e) => {
         const { name, value } = e.target;
         setLocalSettings(prev => ({ ...prev, [name]: value }));
     };
 
-    const saveSettings = () => {
-        updateSettings(localSettings);
-        alert('Settings saved!');
+    const [saving, setSaving] = useState(false);
+
+    const saveSettings = async () => {
+        setSaving(true);
+        try {
+            await updateSettings(localSettings);
+            alert('Ayarlar başarıyla kaydedildi!');
+        } catch (error) {
+            alert('Hata: Ayarlar kaydedilemedi. İnternet bağlantınızı kontrol edin.\n' + error.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleReset = async () => {
+        if (!window.confirm('Okul adını "Teknopark Ankara..." olarak değiştirmek istiyor musunuz?')) return;
+
+        const defaultSettings = {
+            ...localSettings,
+            schoolName: 'Teknopark Ankara İvedik OSB Mesleki ve Teknik Anadolu Lisesi'
+        };
+
+        setLocalSettings(defaultSettings); // Update local UI immediately
+        setSaving(true);
+        try {
+            await updateSettings(defaultSettings);
+            alert('Okul adı sıfırlandı ve kaydedildi!');
+        } catch (error) {
+            alert('Hata: Sıfırlama kaydedilemedi.\n' + error.message);
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleAddSlide = (type) => {
@@ -35,14 +69,24 @@ const Dashboard = () => {
             {/* General Settings Section */}
             <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-semibold text-gray-800">General Settings</h2>
-                    <button
-                        onClick={saveSettings}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                        <Save size={18} />
-                        Save Changes
-                    </button>
+                    <h2 className="text-xl font-semibold text-gray-800">Genel Ayarlar v1.1</h2>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleReset}
+                            disabled={saving}
+                            className="px-4 py-2 text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                            Varsayılan Adı Yükle
+                        </button>
+                        <button
+                            onClick={saveSettings}
+                            disabled={saving}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                        >
+                            <Save size={18} />
+                            {saving ? 'Kaydediliyor...' : 'Kaydet'}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

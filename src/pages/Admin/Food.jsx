@@ -6,6 +6,10 @@ const FoodAdmin = () => {
     const { foodMenu, updateFoodMenu } = useStore();
     const [menu, setMenu] = useState(foodMenu);
 
+    React.useEffect(() => {
+        setMenu(foodMenu);
+    }, [foodMenu]);
+
     const handleChange = (id, itemsString) => {
         const items = itemsString.split(',').map(i => i.trim());
         setMenu(menu.map(item => item.id === id ? { ...item, items } : item));

@@ -6,6 +6,10 @@ const DutyAdmin = () => {
     const { dutyTeachers, updateDutyTeachers } = useStore();
     const [teachers, setTeachers] = useState(dutyTeachers);
 
+    React.useEffect(() => {
+        setTeachers(dutyTeachers);
+    }, [dutyTeachers]);
+
     const handleChange = (id, field, value) => {
         setTeachers(teachers.map(item => item.id === id ? { ...item, [field]: value } : item));
     };

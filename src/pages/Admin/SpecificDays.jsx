@@ -6,6 +6,10 @@ const SpecificDays = () => {
     const { specificDays, updateSpecificDays } = useStore();
     const [list, setList] = useState(specificDays || []);
 
+    React.useEffect(() => {
+        setList(specificDays || []);
+    }, [specificDays]);
+
     const handleChange = (id, field, value) => {
         setList(list.map(item => item.id === id ? { ...item, [field]: value } : item));
     };
