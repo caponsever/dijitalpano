@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useStore } from '../../store/useStore';
-import Carousel from '../../components/Carousel';
 import WeatherWidget from '../../components/WeatherWidget';
 import NewsTicker from '../../components/NewsTicker';
 import Clock from '../../components/Clock';
@@ -109,6 +108,55 @@ const BirthdaySlide = ({ birthdays }) => {
     );
 };
 
+// Re-implemented SlideView using EXACT styles from Carousel.jsx
+const SlideView = ({ slide }) => {
+    return (
+        <div className="relative w-full h-full overflow-hidden bg-black">
+            {slide.type === 'image' ? (
+                <img
+                    src={slide.content}
+                    alt={slide.title}
+                    className="w-full h-full object-cover"
+                />
+            ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-900 to-slate-900 p-20">
+                    <div className="text-center space-y-8 max-w-5xl">
+                        <h2 className="text-6xl font-bold text-white leading-tight drop-shadow-lg">
+                            {slide.content}
+                        </h2>
+                        {slide.title && (
+                            <p className="text-3xl text-blue-200 font-light tracking-wide">
+                                {slide.title}
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Slide Title Overlay for Images - EXACTLY as in Carousel.jsx */}
+            {slide.type === 'image' && slide.title && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-12 pt-32">
+                    <h3 className="text-4xl font-bold text-white drop-shadow-md">{slide.title}</h3>
+                </div>
+            )}
+
+            {/* Progress Bar */}
+            <div className="absolute bottom-0 left-0 h-1 bg-blue-500 z-20"
+                style={{
+                    width: '100%',
+                    animation: `progress ${slide.duration || 10}s linear`
+                }}
+            />
+            <style>{`
+                @keyframes progress {
+                    from { width: 0%; }
+                    to { width: 100%; }
+                }
+            `}</style>
+        </div>
+    );
+};
+
 const SpecificDaysBanner = ({ text }) => {
     if (!text) return null;
     return (
@@ -127,31 +175,51 @@ const PublicDisplay = () => {
         today >= day.startDate && today <= day.endDate
     );
 
-    // State to manage which "Main View" is active
-    // 0: Carousel (Slides)
-    // 1: Schedule
-    // 2: Duty Teachers
-    // 3: Food Menu
-    // 4: Birthdays (if any)
-    const [viewIndex, setViewIndex] = useState(0);
+    // Build Playlist
+    const playlist = useMemo(() => {
+        const list = [];
+
+        // 1. Add all slides (User created content)
+        if (slides && slides.length > 0) {
+            list.push(...slides.map(s => ({ ...s, module: 'slide' })));
+        }
+
+        // 2. Add fixed modules
+        list.push({ id: 'schedule', module: 'schedule', duration: 15 });
+        list.push({ id: 'duty', module: 'duty', duration: 15 });
+        list.push({ id: 'food', module: 'food', duration: 15 });
+
+        // 3. Add Birthday if applicable
+        const hasBirthdays = birthdays.some(b => b.date === today);
+        if (hasBirthdays) {
+            list.push({ id: 'birthday', module: 'birthday', duration: 15 });
+        }
+
+        return list;
+    }, [slides, birthdays, today]);
+
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
-        // Cycle through views every 15 seconds
-        const interval = setInterval(() => {
-            setViewIndex(prev => {
-                const next = prev + 1;
-                // Skip Birthday view (index 4) if no birthdays today
-                const today = new Date().toISOString().split('T')[0];
-                const hasBirthdays = birthdays.some(b => b.date === today);
+        if (playlist.length === 0) return;
 
-                if (next === 4 && !hasBirthdays) return 0;
-                if (next > 4) return 0;
-                return next;
-            });
-        }, 15000);
+        // Ensure index is valid if playlist shrinks
+        if (currentIndex >= playlist.length) {
+            setCurrentIndex(0);
+            return;
+        }
 
-        return () => clearInterval(interval);
-    }, [birthdays]);
+        const currentItem = playlist[currentIndex];
+        const duration = (currentItem.duration || 10) * 1000;
+
+        const timer = setTimeout(() => {
+            setCurrentIndex((prev) => (prev + 1) % playlist.length);
+        }, duration);
+
+        return () => clearTimeout(timer);
+    }, [currentIndex, playlist]);
+
+    const currentItem = playlist[currentIndex] || {};
 
     return (
         <div className="h-screen flex flex-col bg-gray-900 overflow-hidden font-sans">
@@ -185,18 +253,18 @@ const PublicDisplay = () => {
             <main className="flex-1 relative flex bg-gray-100">
                 <AnimatePresence mode='wait'>
                     <motion.div
-                        key={viewIndex}
+                        key={currentItem.id || currentIndex}
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.5 }}
                         className="w-full h-full"
                     >
-                        {viewIndex === 0 && <Carousel slides={slides} />}
-                        {viewIndex === 1 && <ScheduleSlide schedule={bellSchedule} />}
-                        {viewIndex === 2 && <DutySlide teachers={dutyTeachers} />}
-                        {viewIndex === 3 && <FoodSlide menu={foodMenu} />}
-                        {viewIndex === 4 && <BirthdaySlide birthdays={birthdays} />}
+                        {currentItem.module === 'slide' && <SlideView slide={currentItem} />}
+                        {currentItem.module === 'schedule' && <ScheduleSlide schedule={bellSchedule} />}
+                        {currentItem.module === 'duty' && <DutySlide teachers={dutyTeachers} />}
+                        {currentItem.module === 'food' && <FoodSlide menu={foodMenu} />}
+                        {currentItem.module === 'birthday' && <BirthdaySlide birthdays={birthdays} />}
                     </motion.div>
                 </AnimatePresence>
 
