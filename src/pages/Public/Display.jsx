@@ -135,7 +135,7 @@ const SlideView = ({ slide }) => {
 
             {/* Slide Title Overlay for Images - EXACTLY as in Carousel.jsx */}
             {slide.type === 'image' && slide.title && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-12 pt-32">
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-12 pt-32 pb-20 z-30">
                     <h3 className="text-4xl font-bold text-white drop-shadow-md">{slide.title}</h3>
                 </div>
             )}
@@ -160,7 +160,7 @@ const SlideView = ({ slide }) => {
 const SpecificDaysBanner = ({ text }) => {
     if (!text) return null;
     return (
-        <div className="bg-red-600 text-white px-6 py-3 text-center font-bold text-xl shadow-md z-20 relative">
+        <div className="bg-red-600 text-white px-6 py-3 text-center font-bold text-xl shadow-md z-50 relative">
             {text}
         </div>
     );
@@ -224,7 +224,7 @@ const PublicDisplay = () => {
     return (
         <div className="h-screen flex flex-col bg-gray-900 overflow-hidden font-sans">
             {/* Header */}
-            <header className="h-24 bg-gradient-to-r from-blue-900 to-slate-900 flex items-center justify-between px-8 shadow-lg z-10 relative">
+            <header className="h-24 bg-gradient-to-r from-blue-900 to-slate-900 flex items-center justify-between px-8 shadow-lg z-50 relative">
                 <div className="flex items-center gap-6">
                     <div className="w-16 h-16 bg-white rounded-full p-1 shadow-md">
                         <img
@@ -250,7 +250,7 @@ const PublicDisplay = () => {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 relative flex bg-gray-100">
+            <main className="flex-1 relative flex bg-gray-100 z-0">
                 <AnimatePresence mode='wait'>
                     <motion.div
                         key={currentItem.id || currentIndex}
@@ -258,7 +258,7 @@ const PublicDisplay = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.5 }}
-                        className="w-full h-full"
+                        className="w-full h-full relative"
                     >
                         {currentItem.module === 'slide' && <SlideView slide={currentItem} />}
                         {currentItem.module === 'schedule' && <ScheduleSlide schedule={bellSchedule} />}
@@ -269,7 +269,7 @@ const PublicDisplay = () => {
                 </AnimatePresence>
 
                 {/* Weather Overlay */}
-                <div className="absolute bottom-8 right-8 z-20 w-80">
+                <div className="absolute bottom-8 right-8 z-50 w-80">
                     <WeatherWidget city={settings.city} />
                 </div>
             </main>
@@ -278,7 +278,7 @@ const PublicDisplay = () => {
             <SpecificDaysBanner text={activeSpecificDay?.name} />
 
             {/* Footer / Ticker */}
-            <footer className="h-14 bg-blue-950 z-20 relative shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
+            <footer className="h-14 bg-blue-950 z-50 relative shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
                 <NewsTicker text={settings.tickerText} />
             </footer>
         </div>
