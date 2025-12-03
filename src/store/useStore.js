@@ -68,6 +68,7 @@ export const useStore = create((set, get) => ({
         const unsubSlides = onSnapshot(doc(db, COLLECTION, 'slides'), (doc) => {
             console.log('Slides update received. Source:', doc.metadata.fromCache ? 'CACHE' : 'SERVER');
             if (doc.exists()) set({ slides: doc.data().list || [] });
+            else set({ slides: [] });
         }, (error) => console.error('Slides listener error:', error));
 
         const unsubBell = onSnapshot(doc(db, COLLECTION, 'bellSchedule'), (doc) => {

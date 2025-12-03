@@ -54,7 +54,7 @@ const Dashboard = () => {
 
     const handleAddSlide = (type) => {
         const newSlide = {
-            id: Date.now().toString(),
+            id: crypto.randomUUID(),
             type,
             content: type === 'image' ? 'https://via.placeholder.com/1920x1080' : 'New Announcement',
             duration: 10,
@@ -64,7 +64,7 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-4xl mx-auto space-y-8 pb-10">
 
             {/* General Settings Section */}
             <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
