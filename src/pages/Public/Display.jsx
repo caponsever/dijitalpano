@@ -135,7 +135,7 @@ const SlideView = ({ slide }) => {
 
             {/* Slide Title Overlay for Images - EXACTLY as in Carousel.jsx */}
             {slide.type === 'image' && slide.title && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-12 pt-32 pb-20 z-30">
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-12 pt-32 pb-40 z-30">
                     <h3 className="text-4xl font-bold text-white drop-shadow-md">{slide.title}</h3>
                 </div>
             )}
@@ -157,10 +157,10 @@ const SlideView = ({ slide }) => {
     );
 };
 
-const SpecificDaysBanner = ({ text }) => {
+const SpecificDaysBanner = ({ text, isFooterVisible }) => {
     if (!text) return null;
     return (
-        <div className="absolute bottom-14 left-0 right-0 bg-red-600 text-white px-6 py-3 text-center font-bold text-xl shadow-md z-50">
+        <div className={`absolute ${isFooterVisible ? 'bottom-14' : 'bottom-0'} left-0 right-0 bg-red-600 text-white px-6 py-3 text-center font-bold text-xl shadow-md z-50 transition-all duration-300`}>
             {text}
         </div>
     );
@@ -220,6 +220,7 @@ const PublicDisplay = () => {
     }, [currentIndex, playlist]);
 
     const currentItem = playlist[currentIndex] || {};
+    const isImageSlide = currentItem.module === 'slide' && currentItem.type === 'image';
 
     return (
         <div className="h-[100dvh] flex flex-col bg-gray-900 overflow-hidden font-sans">
@@ -269,18 +270,20 @@ const PublicDisplay = () => {
                 </AnimatePresence>
 
                 {/* Weather Overlay */}
-                <div className="absolute bottom-8 right-8 z-50 w-80">
+                <div className="absolute bottom-32 right-8 z-50 w-80">
                     <WeatherWidget city={settings.city} />
                 </div>
             </main>
 
             {/* Specific Days Banner (Overlay) */}
-            <SpecificDaysBanner text={activeSpecificDay?.name} />
+            <SpecificDaysBanner text={activeSpecificDay?.name} isFooterVisible={!isImageSlide} />
 
             {/* Footer / Ticker */}
-            <footer className="h-14 bg-blue-950 z-50 relative shadow-[0_-4px_20px_rgba(0,0,0,0.3)] shrink-0">
-                <NewsTicker text={settings.tickerText} />
-            </footer>
+            {!isImageSlide && (
+                <footer className="h-14 bg-blue-950 z-50 relative shadow-[0_-4px_20px_rgba(0,0,0,0.3)] shrink-0">
+                    <NewsTicker text={settings.tickerText} />
+                </footer>
+            )}
         </div>
     );
 };
