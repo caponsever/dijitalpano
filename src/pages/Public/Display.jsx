@@ -222,9 +222,10 @@ const PublicDisplay = () => {
     const currentItem = playlist[currentIndex] || {};
 
     return (
-        <div className="h-screen flex flex-col bg-gray-900 overflow-hidden font-sans">
+    return (
+        <div className="h-[100dvh] flex flex-col bg-gray-900 overflow-hidden font-sans">
             {/* Header */}
-            <header className="h-24 bg-gradient-to-r from-blue-900 to-slate-900 flex items-center justify-between px-8 shadow-lg z-50 relative">
+            <header className="h-24 bg-gradient-to-r from-blue-900 to-slate-900 flex items-center justify-between px-8 shadow-lg z-50 relative shrink-0">
                 <div className="flex items-center gap-6">
                     <div className="w-16 h-16 bg-white rounded-full p-1 shadow-md">
                         <img
@@ -250,7 +251,7 @@ const PublicDisplay = () => {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 relative flex bg-gray-100 z-0">
+            <main className="flex-1 relative flex bg-gray-100 z-0 overflow-hidden">
                 <AnimatePresence mode='wait'>
                     <motion.div
                         key={currentItem.id || currentIndex}
@@ -258,7 +259,7 @@ const PublicDisplay = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.5 }}
-                        className="w-full h-full relative"
+                        className="absolute inset-0 w-full h-full"
                     >
                         {currentItem.module === 'slide' && <SlideView slide={currentItem} />}
                         {currentItem.module === 'schedule' && <ScheduleSlide schedule={bellSchedule} />}
@@ -278,7 +279,7 @@ const PublicDisplay = () => {
             <SpecificDaysBanner text={activeSpecificDay?.name} />
 
             {/* Footer / Ticker */}
-            <footer className="h-14 bg-blue-950 z-50 relative shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
+            <footer className="h-14 bg-blue-950 z-50 relative shadow-[0_-4px_20px_rgba(0,0,0,0.3)] shrink-0">
                 <NewsTicker text={settings.tickerText} />
             </footer>
         </div>
