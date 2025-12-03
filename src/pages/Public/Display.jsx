@@ -160,7 +160,7 @@ const SlideView = ({ slide }) => {
 const SpecificDaysBanner = ({ text }) => {
     if (!text) return null;
     return (
-        <div className="bg-red-600 text-white px-6 py-3 text-center font-bold text-xl shadow-md z-50 relative">
+        <div className="absolute bottom-14 left-0 right-0 bg-red-600 text-white px-6 py-3 text-center font-bold text-xl shadow-md z-50">
             {text}
         </div>
     );
@@ -274,7 +274,7 @@ const PublicDisplay = () => {
                 </div>
             </main>
 
-            {/* Specific Days Banner */}
+            {/* Specific Days Banner (Overlay) */}
             <SpecificDaysBanner text={activeSpecificDay?.name} />
 
             {/* Footer / Ticker */}
