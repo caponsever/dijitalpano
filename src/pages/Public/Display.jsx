@@ -222,7 +222,6 @@ const PublicDisplay = () => {
     const currentItem = playlist[currentIndex] || {};
 
     return (
-    return (
         <div className="h-[100dvh] flex flex-col bg-gray-900 overflow-hidden font-sans">
             {/* Header */}
             <header className="h-24 bg-gradient-to-r from-blue-900 to-slate-900 flex items-center justify-between px-8 shadow-lg z-50 relative shrink-0">
